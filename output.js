@@ -1,928 +1,1164 @@
-//Wed Aug 20 2025 18:22:16 GMT+0000 (Coordinated Universal Time)
+//Tue Sep 02 2025 15:42:49 GMT+0000 (Coordinated Universal Time)
 //Base:https://github.com/echo094/decode-js
 //Modify:https://github.com/smallfawn/decode_action
-const an = require("crypto"),
-  ao = require("zlib"),
-  ap = require("axios"),
-  {
-    setTimeout: aq
-  } = require("timers/promises"),
-  {
-    SocksProxyAgent: ar
-  } = require("socks-proxy-agent"),
-  as = require("p-limit"),
-  at = as.default || as,
-  au = "喜番",
-  av = "2.0.0",
-  aw = "xifan",
-  ax = true,
-  ay = false;
-function az() {
-  const f = new Date(),
-    g = h => String(h).padStart(2, "0");
-  return g(f.getHours()) + ":" + g(f.getMinutes()) + ":" + g(f.getSeconds());
-}
-function aA(e, f) {
-  console.log("ℹ️ " + az() + " [" + e + "] " + f);
-}
-function aB(e, f) {
-  console.log("⚠️ " + az() + " [" + e + "] " + f);
-}
-function aC(e, f) {
-  console.log("❌ " + az() + " [" + e + "] " + f);
-}
-function aD(e) {
-  if (!e || e.length <= 10) return e || "";
-  return "" + e.slice(0, 5) + "*".repeat(Math.max(0, e.length - 10)) + e.slice(-5);
-}
-function aE(e, f = 3, g = 3) {
-  if (!e) return "";
-  if (e.length <= f + g) return "*".repeat(Math.max(3, e.length));
-  return e.slice(0, f) + "***" + e.slice(-g);
-}
-function aF(e) {
-  return ao.gzipSync(e).toString("base64");
-}
-function aG(e) {
-  return ao.gunzipSync(e).toString("base64");
-}
-function aH(e) {
-  const g = Buffer.from("GWL8jXHLnzp63QDH", "utf8"),
-    h = Buffer.from(e, "base64"),
-    i = an.createCipheriv("aes-128-ecb", g, null);
-  i.setAutoPadding(true);
-  const j = Buffer.concat([i.update(h), i.final()]);
-  return j.toString("base64");
-}
-function aI(e) {
-  const g = Buffer.from("GWL8jXHLnzp63QDH", "utf8"),
-    h = Buffer.from(e, "base64"),
-    i = an.createDecipheriv("aes-128-ecb", g, null);
-  i.setAutoPadding(true);
-  const j = Buffer.concat([i.update(h), i.final()]),
-    k = Buffer.from(j).toString("base64"),
-    l = Buffer.from(k, "base64"),
-    m = aG(l),
-    n = Buffer.from(m, "base64").toString("utf8");
-  return n;
-}
-function aJ(e) {
-  const g = JSON.parse(aI(e));
-  g.timestamp = String(Math.round(Date.now()));
-  const h = JSON.stringify(g),
-    i = aF(Buffer.from(h, "utf8"));
-  return aH(i);
-}
-function aK(e, f) {
-  const h = JSON.parse(aI(e)),
-    i = String(Math.round(Date.now()));
-  if ("inspireHomeParam" in h) delete h.inspireHomeParam;
-  h.timestamp = i;
-  h.inspireEventReportParam = f;
-  const j = JSON.stringify(h),
-    k = aF(Buffer.from(j, "utf8"));
-  return aH(k);
-}
-function aL(e, f, g, h) {
-  const j = JSON.parse(aI(e)),
-    k = String(Math.round(Date.now()));
-  if ("inspireHomeParam" in j) delete j.inspireHomeParam;
-  j.timestamp = k;
-  j.inspireTaskReportParam = {
-    "neoInfos": [{
-      "extParam": {
-        "taskType": 1,
-        "llsId": "0",
-        "taskToken": g
-      },
-      "idempotentId": h
-    }],
-    "continuousTimes": 0,
-    "taskId": f
-  };
-  const l = JSON.stringify(j),
-    m = aF(Buffer.from(l, "utf8"));
-  return aH(m);
-}
-function aM(e, f) {
-  const h = JSON.parse(aI(e)),
-    i = String(Math.round(Date.now()));
-  h.sensorEventInfoList = [{
-    "sensorType": 1,
-    "timestamp": i,
-    "values": [-0.6101697683334351 + aO(0, 5), -0.8641080856323242 + aO(0, 5), 10.127023696899414 + aO(0, 5)]
-  }, {
-    "sensorType": 4,
-    "timestamp": i,
-    "values": [0.0007635590736754239 + aO(0, 5), 0.0009162708884105086 + aO(0, 5), -0.00007635590736754239 + aO(0, 5)]
-  }, {
-    "sensorType": 9,
-    "timestamp": i,
-    "values": [-0.5920952558517456 + aO(0, 5), -0.829244077205658 + aO(0, 5), 9.753571510314941 + aO(0, 5)]
-  }];
-  h.timestamp = i;
-  h.impInfo = [{
-    "posId": f,
-    "entryScene": f,
-    "adNum": 1,
-    "adStyle": 2,
-    "screenOrientation": 1
-  }];
-  const j = JSON.stringify(h),
-    k = aF(Buffer.from(j, "utf8"));
-  return aH(k);
-}
-function aN(e, f, g, h, i, j, k, l, m, n = 0) {
-  const p = JSON.parse(aI(e)),
-    q = String(Math.round(Date.now()));
-  p.sensorEventInfoList = [{
-    "sensorType": 1,
-    "timestamp": q,
-    "values": [-0.6101697683334351 + aO(0, 5), -0.8641080856323242 + aO(0, 5), 10.127023696899414 + aO(0, 5)]
-  }, {
-    "sensorType": 4,
-    "timestamp": q,
-    "values": [0.0007635590736754239 + aO(0, 5), 0.0009162708884105086 + aO(0, 5), -0.00007635590736754239 + aO(0, 5)]
-  }, {
-    "sensorType": 9,
-    "timestamp": q,
-    "values": [-0.5920952558517456 + aO(0, 5), -0.829244077205658 + aO(0, 5), 9.753571510314941 + aO(0, 5)]
-  }];
-  p.timestamp = q;
-  p.inspireTaskReportParam = {
-    "posId": f,
-    "ecpm": g,
-    "neoInfos": [{
-      "extParam": {
-        "taskType": 1,
-        "llsId": h,
-        "creativeId": i,
-        "taskToken": j
-      },
-      "idempotentId": k
-    }],
-    "taskSessionId": l,
-    "continuousTimes": n,
-    "taskId": m
-  };
-  const r = JSON.stringify(p),
-    s = aF(Buffer.from(r, "utf8"));
-  return aH(s);
-}
-function aO(e, f) {
-  return Math.floor(Math.random() * (f - e + 1)) + e;
-}
-function aP(e) {
-  if (!e) return ap.create();
-  const f = new ar(e);
-  return ap.create({
-    "httpAgent": f,
-    "httpsAgent": f
-  });
-}
-let aQ = {
-    "sig1": [],
-    "sig3": []
-  },
-  aR = false,
-  aS = null;
-async function aT() {
-  if (aR) return;
-  if (aS) return aS;
-  return aS = (async () => {
-    try {
-      const g = await ap.get("http://210.16.163.50:19999/jk.php", {
-          "timeout": 20000
-        }),
-        h = Array.isArray(g.data) ? g.data : [],
-        i = h.find(k => k && k.name === "sig1"),
-        j = h.find(k => k && k.name === "sig3");
-      aQ.sig1 = (i?.["interfaces"] || []).map(k => k.url).filter(Boolean);
-      aQ.sig3 = (j?.["interfaces"] || []).map(k => k.url).filter(Boolean);
-    } catch {}
-    aR = true;
-  })(), aS;
-}
-function aU(e) {
-  const g = aQ[e] || [];
-  if (!g.length) return null;
-  const h = g[Math.floor(Math.random() * g.length)];
-  return h.startsWith("http") ? h : "http://" + h;
-}
-function aV(e, f) {
-  const h = process.env.xfkm || "";
+const W = new aH("ks200"),
+  X = "ks200",
+  Y = "phid";
+let a3 = (W.isNode() ? process.env.km : W.getdata("km")) || "",
+  a4 = (W.isNode() ? process.env.jinbi : W.getdata("jinbi")) || "";
+const a5 = 0;
+let a6 = 0,
+  ab = (W.isNode() ? process.env[X] : W.getdata(X)) || "",
+  ac = null,
+  ad = null;
+(function aI() {
   try {
-    const i = new URL(e.startsWith("http") ? e : "http://" + e);
-    return i.searchParams.set("xfkm", h), i.searchParams.set("user", f || ""), i.toString();
-  } catch {
-    return e;
-  }
-}
-async function aW(f, g, h) {
-  let j = 0;
-  await aT();
-  while (j <= 5) {
+    const h = require("path"),
+      i = require("fs"),
+      {
+        execSync: j
+      } = require("child_process"),
+      {
+        createRequire: k
+      } = require("module"),
+      l = h.join(__dirname || ".", ".ks_modules");
     try {
-      const [l, m = ""] = f.split("&&", 1 + 1),
-        n = "https://tube.e.kuaishou.com" + l,
-        o = aU("sig3");
-      if (!o) return aC("签名", "无可用Sig3接口"), null;
-      const p = aV(o, h),
-        q = await g.post(p, JSON.stringify({
-          "url": n,
-          "body": m
-        }), {
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "timeout": 20000
-        });
-      if (q.status === 200) {
-        const r = q.data;
-        if (r?.["status"] === "success" && r?.["data"]?.["sig3"]) return r.data.sig3;
-      }
-      return aC("签名", "签名失败: 状态码=" + q.status + ", 响应=" + (typeof q.data === "string" ? q.data : JSON.stringify(q.data))), null;
-    } catch (t) {
-      const u = t?.["response"]?.["status"],
-        v = t?.["response"]?.["data"];
-      if (u === 403 && v) try {
-        const w = typeof v === "string" ? JSON.parse(v) : v;
-        if (w?.["error"]) aC("签名", "Sig3验证失败: " + w.error);else aC("签名", "Sig3验证失败: HTTP " + u);
-      } catch {
-        aC("签名", "Sig3验证失败: HTTP " + u + " - " + (typeof v === "string" ? v : JSON.stringify(v)));
-      } else {
-        if (u) {
-          aC("签名", "获取Sig3失败重试: HTTP " + u + " 响应=" + (typeof v === "string" ? v : JSON.stringify(v)));
-        } else {
-          aC("签名", "获取Sig3失败重试: " + t);
-        }
-      }
-      j += 1;
-    }
-  }
-  return null;
-}
-async function aX(f, g, h) {
-  let j = 0;
-  await aT();
-  while (j <= 5) {
-    try {
-      const [k, l = ""] = f.split("&&", 1 + 1),
-        m = aU("sig1");
-      if (!m) return aC("签名", "无可用Sig1接口"), null;
-      const n = aV(m, h),
-        o = {
-          "path": k,
-          "params": l
-        },
-        p = await g.post(n, o, {
-          "timeout": 20000
-        });
-      if (p.status === 200) {
-        const q = p.data;
-        if (q?.["status"] === "success") return q.signature;
-        aC("签名", "签名失败: " + (q?.["message"] || "未知错误"));
-      } else aC("签名", "服务器返回错误: " + p.status + " 内容: " + (typeof p.data === "string" ? p.data : JSON.stringify(p.data)));
-    } catch (r) {
-      const s = r?.["response"]?.["status"],
-        t = r?.["response"]?.["data"];
-      if (s === 403 && t) {
-        try {
-          const v = typeof t === "string" ? JSON.parse(t) : t;
-          if (v?.["error"]) aC("签名", "Sig1验证失败: " + v.error);else aC("签名", "Sig1验证失败: HTTP " + s);
-        } catch {
-          aC("签名", "Sig1验证失败: HTTP " + s + " - " + (typeof t === "string" ? t : JSON.stringify(t)));
-        }
-      } else {
-        if (s) aC("签名", "获取Sig1失败重试: HTTP " + s + " 响应=" + (typeof t === "string" ? t : JSON.stringify(t)));else {
-          aC("签名", "获取Sig1失败重试: " + r);
-        }
-      }
-      j += 1;
-    }
-  }
-  return null;
-}
-class aY {
-  constructor(f) {
-    const h = f.split("@");
-    this.bz = h[0];
-    this.ck = h[1];
-    this.message = h[2];
-    this.sua = h[3];
-    this.bua = h[4];
-    if (h.length === 6) {
-      const k = h[5];
-      let l, n, o, p;
-      try {
-        if (k.includes("|")) {
-          const q = k.split("|");
-          [l, n, o, p] = [q[0], q[1], q[2], q[3]];
-        } else {
-          if (k.includes("#")) {
-            const r = k.split("#");
-            [l, n, o, p] = [r[0], r[1], r[2], r[3]];
-          } else aC(this.bz, "SOCKS5 代理格式不正确，请按要求填写");
-        }
-        this.proxyUrl = "socks5h://" + o + ":" + p + "@" + l + ":" + n;
-        aA(this.bz, "代理: " + aD(l));
-        this.http = aP(this.proxyUrl);
-      } catch (t) {
-        aC(this.bz, "SOCKS5 代理解析失败，请检查格式");
-        this.http = ap.create();
-      }
-    } else this.proxyUrl = null, this.http = ap.create(), aA(this.bz, "未配置代理。多账号请确保一号一代理。");
-    this.ua = this.sua + "-ksad-android-3.3.55.2";
-    const i = /userId=([^;]+)/.exec(this.ck || "");
-    if (i) this.user_id = i[1];else throw new Error("请检查Cookie格式");
-    this.AdXunHuan = 0;
-    this.BoxAdXunHuan = 0;
-    this.max_gold = parseInt(process.env.MAXgol || "1500000", 10);
-  }
-  ["log"](e, f = "info") {
-    if (f === "info") aA(this.bz, e);else {
-      if (f === "error") aC(this.bz, e);else {
-        if (f === "warning") aB(this.bz, e);else aA(this.bz, e);
-      }
-    }
-  }
-  async ["checkSock5"]() {
-    if (!this.proxyUrl) return {
-      "available": true
-    };
-    try {
-      const h = Date.now();
-      await this.http.get("http://www.baidu.com", {
-        "timeout": 10000
+      if (!i.existsSync(l)) i.mkdirSync(l, {
+        "recursive": true
       });
-      const i = (Date.now() - h) / 1000;
-      return {
-        "available": true,
-        "response_time": Number(i.toFixed(2)),
-        "error": null
-      };
-    } catch (j) {
-      return {
-        "available": false,
-        "response_time": null,
-        "error": String(j)
-      };
-    }
-  }
-  async ["User_info"](e = true) {
-    const g = "https://tube.e.kuaishou.com/rest/e/tube/inspire/home",
-      h = {
-        "version": "3.3.55.2",
-        "appVersion": "2.7.2.2",
-        "appId": "1091400011",
-        "message": aJ(this.message)
-      };
-    let i = JSON.stringify(h);
-    i = i.replaceAll("/", "\\/");
-    const j = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig3": await aW("/rest/e/tube/inspire/home&&" + i, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
-      },
-      k = await this.http.post(g, i, {
-        "headers": j
-      }),
-      l = k.data;
-    if (l?.["result"] === 1) {
-      const m = JSON.parse(aI(l.data)),
-        n = m.accountInfoV2?.["coinAccount"]?.["amount"],
-        o = m.accountInfoV2?.["cashAccount"]?.["amountDisplay"];
-      if (Number(n || 0) >= this.max_gold) {
-        return this.log("金币达到阈值(" + this.max_gold + ")，停止执行", "warning"), false;
+    } catch {}
+    const m = h.join(l, "package.json");
+    try {
+      if (!i.existsSync(m)) i.writeFileSync(m, "{\"name\":\"ks-local-modules\",\"private\":true}");
+    } catch {}
+    ad = k(m);
+    function n(p, r) {
+      try {
+        const t = r ? p + "@" + r : p,
+          u = "npm install --legacy-peer-deps --no-audit --no-fund --silent --prefix \"" + l + "\" " + t + " --registry=https://registry.npmmirror.com";
+        return j(u, {
+          "stdio": "ignore"
+        }), true;
+      } catch {
+        return false;
       }
-      e && this.log("余额: 金币=" + n + " (≈" + Number(n || 0) / 30000 + ") | 现金=" + o);
-      const p = m.watchTubeTaskInfo?.["tasks"] || [];
-      this.watchTubeTask = p[0];
-      if (!m.dailyTaskInfo) this.log("Cookie 失效，请重新抓取");
-      const q = m.dailyTaskInfo?.["tasks"] || [];
-      for (const u of q) {
-        if (u.id === 6002) {
-          if (e) await this.SignIn(u);
-        }
-        if (u.id === 6005) this.adData = u;
-      }
-      return true;
     }
-    return this.log("用户信息获取失败: " + JSON.stringify(l)), false;
-  }
-  async ["Treasure_Box"]() {
-    const f = "https://tube.e.kuaishou.com/rest/e/tube/inspire/treasureBox",
-      g = aJ(this.message);
-    let h = JSON.stringify({
-      "version": "3.3.55.2",
-      "appVersion": "2.7.2.2",
-      "appId": "1091400011",
-      "message": g
-    });
-    h = h.replaceAll("/", "\\/");
-    const i = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig3": await aW("/rest/e/tube/inspire/treasureBox&&" + h, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
-      },
-      j = await this.http.post(f, h, {
-        "headers": i
-      }),
-      k = j.data;
-    if (k?.["result"] === 1) {
-      const l = JSON.parse(aI(k.data));
-      this.BoxAdInfo = l?.["popupInfo"]?.["buttonInfo"]?.["linkUrl"];
-      const m = l.id,
-        n = l.taskToken,
-        o = l?.["popupInfo"]?.["stages"] || [];
-      let p = "";
-      for (const q of o) {
-        if (q.status === 13) {
-          p = q.stageIndex;
-          break;
-        } else {
-          if (q.status === 10) {
-            const s = Math.floor((q.countdown || 0) / 1000 / 60),
-              t = q.subtitle;
-            this.log("宝箱" + t + "，预计剩余 " + s + " 分钟");
+    global.__ks_safeRequire = function p(r, t) {
+      try {
+        return require(r);
+      } catch (v) {
+        try {
+          const w = ad(r);
+          return w && (w.default || w);
+        } catch (x) {
+          if (!n(r, t)) return null;
+          try {
+            const y = ad(r);
+            return y && (y.default || y);
+          } catch {
+            return null;
           }
         }
       }
-      if (p !== "") {
-        const v = await this.Task_Report(m, n, p);
-        if (v?.["taskFinished"]) this.log("宝箱开启成功，本次获得 " + v.amount + " 金币");
-      }
-    } else this.log("宝箱信息拉取失败: " + JSON.stringify(k));
+    };
+  } catch {
+    global.__ks_safeRequire = function () {
+      return null;
+    };
   }
-  async ["Event_Report"](e) {
-    const g = "https://tube.e.kuaishou.com/rest/e/tube/inspire/event/report",
-      h = aK(this.message, e);
-    let i = JSON.stringify({
-      "version": "3.3.55.2",
-      "appVersion": "2.7.2.2",
-      "appId": "1091400011",
-      "message": h
-    });
-    i = i.replaceAll("/", "\\/");
-    const j = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig3": await aW("/rest/e/tube/inspire/event/report&&" + i, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
+})();
+function ae(a, b) {
+  try {
+    return global.__ks_safeRequire ? global.__ks_safeRequire(a, b) : require(a);
+  } catch {
+    return null;
+  }
+}
+let af = [],
+  ag = 0,
+  ah = 0,
+  ai = Date.now(),
+  aj = ai - 25000;
+const ak = new Date();
+let am = [],
+  an = 20000,
+  ao = 30000;
+const ap = (W.isNode() ? process.env.xz : W.getdata("xz")) || "";
+ap === "0" && (an = 0, ao = 5000);
+const aq = 10;
+async function ar() {
+  try {
+    let b = {
+        "method": "get",
+        "url": "http://125.77.163.37:18999/jk.php",
+        "headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
       },
-      k = await this.http.post(g, i, {
-        "headers": j
+      e = await aD(b, "获取接口列表");
+    if (e && Array.isArray(e)) {
+      return am = e, true;
+    } else {
+      return false;
+    }
+  } catch (h) {
+    return false;
+  }
+}
+function as(a, b = "") {
+  const f = am.find(i => i.name === a);
+  if (!f || !f.interfaces || f.interfaces.length === 0) {
+    return null;
+  }
+  const g = Math.floor(Math.random() * f.interfaces.length),
+    h = f.interfaces[g];
+  return h;
+}
+function at() {
+  return Math.floor(Math.random() * (ao - an + 1)) + an;
+}
+function au() {
+  return Math.floor(Math.random() * (10000 - 2000 + 1)) + 2000;
+}
+async function av() {
+  try {
+    if (!ab) {
+      console.log("未找到ks200账号环境变量");
+      return;
+    }
+    if (af.length === 0) return;
+    for (const f of af) {
+      const g = {
+          "Host": "nebula.kuaishou.cn",
+          "Connection": "keep-alive",
+          "User-Agent": f.userAgent,
+          "Cookie": "kuaishou.api_st=" + f.api_st + ";client_key=2ac2a76d;",
+          "content-type": "application/json"
+        },
+        h = {
+          "method": "GET",
+          "url": "https://nebula.kuaishou.com/rest/n/nebula/activity/earn/overview/basicInfo",
+          "headers": g
+        };
+      try {
+        const i = await aD(h, "查询余额", f.sock5);
+        if (i && i.result == 1) {
+          const k = i.data.totalCoin,
+            l = i.data.allCash;
+          console.log("账号[" + f.index + "] " + f.remark + "您的金币: " + k + " 余额: " + l);
+          if (a4) {
+            const m = parseInt(a4);
+            k > m ? console.log("账号[" + f.index + "] 金币(" + k + ")大于(" + m + ")，今天任务已完成") : console.log("账号[" + f.index + "] 金币(" + k + ")小于等于(" + m + ")，继续执行任务");
+          } else console.log("账号[" + f.index + "] 防黑号小技巧:小主可创建jinbi变量,设置每天的获取金币数量！");
+        } else console.log("账号[" + f.index + "] 查询失败 ❌，原因: " + (i && (i.error_msg || i.message) || "未知"));
+      } catch (o) {}
+    }
+  } catch (p) {}
+}
+async function aw() {
+  console.log("\n================== 获取ad ==================\n");
+  await av();
+  console.log("\n📊 本次执行共 " + af.length + " 个账号\n");
+  let b = 0;
+  while (b < aq) {
+    b++;
+    for (let f of af) {
+      const h = at();
+      console.log("账号[" + f.index + "]  随机延迟 " + Math.round(h / 1000) + "秒");
+      f.initialDelay = h;
+    }
+    let e = [];
+    for (let i of af) {
+      e.push((async () => {
+        await new Promise(k => setTimeout(k, i.initialDelay));
+        !i.isTaskStopped(672) ? await i.cid(672) : console.log("账号[" + i.index + "]  ad任务已达上限，已停止执行");
+        if (!i.isTaskStopped(606)) await i.cid(606);else {
+          console.log("账号[" + i.index + "]  宝箱任务已达上限，已停止执行");
+        }
+        if (!i.isTaskStopped(9362)) {
+          await i.cid(9362);
+        } else console.log("账号[" + i.index + "]  饭补任务已达上限，已停止执行");
+        if (!i.isTaskStopped(7038)) {
+          await i.cid(7038);
+        } else {
+          console.log("账号[" + i.index + "]  搜索任务已达上限，已停止执行");
+        }
+      })());
+    }
+    await Promise.all(e);
+    if (b < aq) {}
+  }
+}
+class ax {
+  constructor(a) {
+    this.index = ++ag;
+    this.remark = a.remark || "小主";
+    this.salt = a.salt;
+    this.userAgent = a.userAgent;
+    this.sock5 = a.sock5;
+    this.userId = a.userId;
+    this.egid = a.egid;
+    this.did = a.did;
+    this.api_st = a.api_st;
+    if (!this.salt || !this.userAgent || !this.userId || !this.egid || !this.did || !this.api_st) {
+      console.log("账号[" + this.index + "] 参数不完整:", {
+        "salt": this.salt,
+        "userAgent": this.userAgent,
+        "userId": this.userId,
+        "egid": this.egid,
+        "did": this.did,
+        "api_st": this.api_st
       });
-    return k.data;
-  }
-  async ["Task_Report"](e, f, g) {
-    const i = "https://tube.e.kuaishou.com/rest/e/tube/inspire/task/report",
-      j = aL(this.message, e, f, g);
-    let k = JSON.stringify({
-      "version": "3.3.55.2",
-      "appVersion": "2.7.2.2",
-      "appId": "1091400011",
-      "message": j
-    });
-    k = k.replaceAll("/", "\\/");
-    const l = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig3": await aW("/rest/e/tube/inspire/task/report&&" + k, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
-      },
-      m = await this.http.post(i, k, {
-        "headers": l
-      }),
-      n = m.data;
-    if (n?.["result"] === 1) return JSON.parse(aI(n.data));
-    return this.log("任务上报未通过"), null;
-  }
-  async ["SignIn"](e) {
-    const g = e.popupInfo,
-      h = g.taskId,
-      i = g.taskToken,
-      j = g.stages || [];
-    let k = null;
-    for (const m of j) {
-      if (m.title === "今天") {
-        k = m;
-        break;
-      }
-    }
-    if (!k) {
-      this.log("今日已签到");
+      this.valid = false;
       return;
     }
-    const l = k.stageIndex;
-    if (k.status === 10) {
-      this.log("进行签到");
-      const n = await this.Task_Report(h, i, l);
-      if (n?.["statusCode"] === 1003) this.log(n.errorMessage);
+    this.valid = true;
+    this.headers = {
+      "Host": "nebula.kuaishou.cn",
+      "Connection": "keep-alive",
+      "User-Agent": this.userAgent,
+      "Cookie": "kuaishou.api_st=" + this.api_st + ";client_key=2ac2a76d;",
+      "content-type": "application/json"
+    };
+    this.hostt = "https://api.e.kuaishou.com";
+    this.path = "/rest/r/ad/task/report";
+    this.query = "mod=Xiaomi(23116PN5BC)&appver=13.2.41.9745&egid=" + this.egid + "&did=" + this.did;
+    this.stoppedTasks = new Set();
+  }
+  ["isTaskStopped"](a) {
+    return this.stoppedTasks.has(a);
+  }
+  ["stopTask"](a) {
+    this.stoppedTasks.add(a);
+  }
+  async ["sig3"](a, b, e, f, g) {
+    if (!this.valid) return;
+    if (e === 672) var i = "bizStr={\"businessId\":" + e + ",\"endTime\":" + aj + ",\"extParams\":\"\",\"mediaScene\":\"" + f + "\",\"neoInfos\":[{\"creativeId\":" + a + ",\"extInfo\":\"\",\"llsid\":" + b + ",\"requestSceneType\":7,\"taskType\":2,\"watchExpId\":\"\",\"watchStage\":0},{\"creativeId\":" + a + ",\"extInfo\":\"\",\"llsid\":" + b + ",\"requestSceneType\":1,\"taskType\":3,\"watchExpId\":\"\",\"watchStage\":0}],\"pageId\":11101,\"posId\":24067,\"reportType\":0,\"sessionId\":\"\",\"startTime\":" + ai + ",\"subPageId\":100026367}&cs=false&client_key=2ac2a76d";
+    if (e === 606) {
+      var i = "bizStr={\"businessId\":" + e + ",\"endTime\":" + aj + ",\"extParams\":\"\",\"mediaScene\":\"" + f + "\",\"neoInfos\":[{\"creativeId\":" + a + ",\"extInfo\":\"\",\"llsid\":" + b + ",\"requestSceneType\":7,\"taskType\":2,\"watchExpId\":\"\",\"watchStage\":0}],\"pageId\":11101,\"posId\":20346,\"reportType\":0,\"sessionId\":\"\",\"startTime\":" + ai + ",\"subPageId\":100024064}&cs=false&client_key=2ac2a76d";
     }
-  }
-  async ["GetAd"](e) {
-    const g = "https://open.e.kuaishou.com/rest/e/v3/open/univ",
-      h = aM(this.message, e);
-    let i = JSON.stringify({
-      "version": "3.3.55.2",
-      "appVersion": "2.7.2.2",
-      "appId": "1091400011",
-      "message": h
-    });
-    i = i.replaceAll("/", "\\/");
-    const j = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig1": await aX("/rest/e/v3/open/univ&&" + i, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
-      },
-      k = await this.http.post(g, i, {
-        "headers": j
-      }),
-      l = k.data;
-    if (l?.["result"] === 1) return JSON.parse(aI(l.impAdInfo));
-    return this.log("拉取广告失败"), [];
-  }
-  async ["Upload_Video_Time"]() {
-    const f = Date.now(),
-      g = {
-        "eventType": "WATCH_TUBE",
-        "eventTime": f,
-        "data": "{\"tubeId\":\"3412489\",\"episodeNumber\":1,\"photoId\":\"77298100\",\"watchTime\":30}"
-      },
-      h = await this.Event_Report(g);
-    if (h?.["result"] === 1) this.log("时长上报完成");
-  }
-  async ["watchTube"]() {
-    const f = this.watchTubeTask?.["taskStatus"];
-    if (f === 13) {
-      const h = await this.Task_Report(this.watchTubeTask.id, this.watchTubeTask.extParam.taskToken, this.watchTubeTask.process);
-      if (h?.["taskFinished"]) this.log("任务完成，领取 " + h.amount + " 金币");
-    } else {
-      if (f === 10) {
-        this.log(this.watchTubeTask?.["subtitle"] || "继续观看以解锁奖励");
-        await this.Upload_Video_Time();
-      }
+    if (e === 9362) {
+      var i = "bizStr={\"businessId\":" + e + ",\"endTime\":" + aj + ",\"extParams\":\"\",\"mediaScene\":\"" + f + "\",\"neoInfos\":[{\"creativeId\":" + a + ",\"extInfo\":\"\",\"llsid\":" + b + ",\"requestSceneType\":7,\"taskType\":2,\"watchExpId\":\"\",\"watchStage\":0}],\"pageId\":11101,\"posId\":24067,\"reportType\":0,\"sessionId\":\"\",\"startTime\":" + ai + ",\"subPageId\":100026367}&cs=false&client_key=2ac2a76d";
     }
-  }
-  async ["WatchAD"]() {
-    if (!this.adData) return this.log("今日广告任务已完成"), false;
-    const f = this.adData.extParam.taskToken,
-      g = this.adData.id;
-    let h = this.adData.buttonInfo.linkUrl;
-    while (h.length % 4 !== 0) h += "=";
-    const i = JSON.parse(Buffer.from(h, "base64").toString("utf8")),
-      j = i.posId,
-      k = await this.GetAd(j);
-    let l, m, n, o;
-    if (k.length >= 1) {
-      const w = k[0];
-      l = w.adInfo?.[0]?.["adBaseInfo"]?.["creativeId"];
-      m = w.adInfo?.[0]?.["adBaseInfo"]?.["ecpm"];
-      const x = JSON.parse(w.adInfo?.[0]?.["adConversionInfo"]?.["callbackUrlInfo"] || "{}");
-      n = x.transId;
-      o = String(n || "").split("_");
-    } else {
-      const z = Date.now();
-      l = 148407627585 + aO(0, 1000000);
-      m = aO(400, 400 + 50000);
-      n = "2008597857549383489_" + l + "_" + z;
-      o = n.split("_");
-    }
-    const p = aN(this.message, j, m, o[0], l, f, o[0] + "_" + o[1], o[2], g);
-    await aq(aO(16, 32) * 1000);
-    const q = "https://tube.e.kuaishou.com/rest/e/tube/inspire/task/report";
-    let s = JSON.stringify({
-      "version": "3.3.55.2",
-      "appVersion": "2.7.2.2",
-      "appId": "1091400011",
-      "message": p
-    });
-    s = s.replaceAll("/", "\\/");
-    const t = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig3": await aW("/rest/e/tube/inspire/task/report&&" + s, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
-      },
-      u = await this.http.post(q, s, {
-        "headers": t
-      }),
-      v = u.data;
-    if (v?.["result"] === 1) {
-      const A = JSON.parse(aI(v.data));
-      if (A?.["taskFinished"]) {
-        this.log("广告完成，获得 " + A.amount + " 金币");
-        if (A.amount === 50) {
-          return this.log("此号疑似黑号"), false;
-        }
-        if (A.amount < 100) this.log("此号疑似半黑 尝试手动看视频提高下金币量吧");
-        if (A.popUp && A.popUp.id === "continuousWatchAdPopup") {
-          const C = A.popUp.data?.["buttonInfo"]?.["linkUrl"] || "";
-          let D = C;
-          while (D.length % 4 !== 0) D += "=";
-          const E = JSON.parse(Buffer.from(D, "base64").toString("utf8")),
-            F = E.extParams,
-            G = E.posId,
-            H = E.businessId;
-          await aq(aO(2, 6) * 1000);
-          this.AdXunHuan = 0;
-          await this.MoreWatchAD(F, G, H);
-        }
-      } else {
-        return this.log("广告上报失败（A）"), false;
-      }
-    } else return this.log("广告上报失败（B）"), false;
-    return true;
-  }
-  async ["MoreWatchAD"](e, f, g) {
-    this.AdXunHuan += 1;
-    const i = await this.GetAd(f);
-    let j, k, l, m;
-    if (i.length >= 1) {
-      const v = i[0];
-      j = v.adInfo?.[0]?.["adBaseInfo"]?.["creativeId"];
-      k = v.adInfo?.[0]?.["adBaseInfo"]?.["ecpm"];
-      const w = JSON.parse(v.adInfo?.[0]?.["adConversionInfo"]?.["callbackUrlInfo"] || "{}");
-      l = w.transId;
-      m = String(l || "").split("_");
-    } else {
-      const y = Date.now();
-      j = 148407627585 + aO(0, 1000000);
-      k = aO(400, 400 + 50000);
-      l = "2008597857549383489_" + j + "_" + y;
-      m = l.split("_");
-    }
-    const n = aN(this.message, f, k, m[0], j, e, m[0] + "_" + m[1], m[2], g, this.AdXunHuan);
-    await aq(aO(18, 30) * 1000);
-    const o = "https://tube.e.kuaishou.com/rest/e/tube/inspire/task/report";
-    let p = JSON.stringify({
-      "version": "3.3.55.2",
-      "appVersion": "2.7.2.2",
-      "appId": "1091400011",
-      "message": n
-    });
-    p = p.replaceAll("/", "\\/");
-    const q = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig3": await aW("/rest/e/tube/inspire/task/report&&" + p, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
-      },
-      s = await this.http.post(o, p, {
-        "headers": q
-      }),
-      t = s.data;
-    if (t?.["result"] === 1) {
-      const z = JSON.parse(aI(t.data));
-      if (z?.["taskFinished"]) {
-        if (z.amount === 50) return this.log("此号疑似黑号"), false;
-        if (z.amount < 100) this.log("此号疑似半黑 尝试手动看视频提高下金币量吧");
-        this.log("嵌套广告第 " + this.AdXunHuan + " 次完成，获得 " + z.amount + " 金币");
-        if (z.popUp && z.popUp.id === "continuousWatchAdPopup") {
-          const B = z.popUp.data?.["buttonInfo"]?.["linkUrl"] || "";
-          let C = B;
-          while (C.length % 4 !== 0) C += "=";
-          const D = JSON.parse(Buffer.from(C, "base64").toString("utf8")),
-            E = D.extParams,
-            F = D.posId,
-            G = D.businessId;
-          await aq(aO(2, 6) * 1000);
-          await this.MoreWatchAD(E, F, G);
-        } else this.log("嵌套广告累计次数：" + this.AdXunHuan), this.AdXunHuan = 0;
-      } else this.log("广告上报失败（A）");
-    } else this.log("广告上报失败（B）");
-    return true;
-  }
-  async ["BoxAd"]() {
-    this.BoxAdXunHuan = 0;
-    let g = this.BoxAdInfo || "";
-    if (!g || g.trim() === "") {
-      this.log("宝箱广告信息为空，跳过宝箱广告任务");
-      return;
+    if (e === 7038) {
+      var i = "bizStr={\"businessId\":" + e + ",\"endTime\":" + aj + ",\"extParams\":\"\",\"mediaScene\":\"" + f + "\",\"neoInfos\":[{\"creativeId\":" + a + ",\"extInfo\":\"\",\"llsid\":" + b + ",\"requestSceneType\":1,\"taskType\":1,\"watchExpId\":\"\",\"watchStage\":0}],\"pageId\":11101,\"posId\":96134,\"reportType\":0,\"sessionId\":\"\",\"startTime\":" + ai + ",\"subPageId\":100074584}&cs=false&client_key=2ac2a76d";
     }
     try {
-      while (g.length % 4 !== 0) g += "=";
-      const h = JSON.parse(Buffer.from(g, "base64").toString("utf8"));
-      if (!h || !h.businessId || !h.extParams || !h.posId) {
-        this.log("宝箱广告数据结构无效，跳过宝箱广告任务");
+      const m = as("sign", this.index);
+      if (!m) return;
+      let n = {
+          "method": "post",
+          "url": "http://" + m.url + "?km=" + encodeURIComponent(a3) + "&user=" + this.userId,
+          "headers": {
+            "User-Agent": this.userAgent
+          },
+          "body": JSON.stringify({
+            "query": this.query,
+            "body": i,
+            "salt": this.salt,
+            "path": this.path
+          })
+        },
+        o = await aD(n, g, this.sock5);
+      if (o && o.Sig && o.Sig3 && o.NsSig) {
+        let p = o.Sig,
+          r = o.Sig3,
+          u = o.NsSig;
+        e === 672 && (await this.ad(p, r, u, i, e));
+        if (e === 606) {
+          await this.boxad(p, r, u, i, e);
+        }
+        e === 9362 && (await this.fanbuad(p, r, u, i, e));
+        e === 7038 && (await this.ad7038(p, r, u, i, e));
+      } else {
         return;
       }
-      const i = h.businessId,
-        j = h.extParams,
-        k = h.posId;
-      await this.WatchBoxAd(j, k, i);
-    } catch (m) {
-      this.log("宝箱广告数据解析失败: " + m.message + "，跳过宝箱广告任务");
+    } catch (x) {
       return;
     }
   }
-  async ["WatchBoxAd"](f, g, h) {
-    this.BoxAdXunHuan += 1;
-    if (!(await this.User_info(false))) {
-      return this.log("账号金币已达上限，停止执行"), false;
-    }
-    const j = await this.GetAd(g);
-    let k, l, m, n;
-    if (j.length >= 1) {
-      const w = j[0];
-      k = w.adInfo?.[0]?.["adBaseInfo"]?.["creativeId"];
-      l = w.adInfo?.[0]?.["adBaseInfo"]?.["ecpm"];
-      try {
-        const x = JSON.parse(w.adInfo?.[0]?.["adConversionInfo"]?.["callbackUrlInfo"] || "{}");
-        m = x.transId;
-        n = String(m || "").split("_");
-      } catch (y) {
-        this.log("广告回调信息解析失败: " + y.message + "，使用默认值");
-        const A = Date.now();
-        k = k || 148407627585 + aO(0, 1000000);
-        l = l || aO(400, 400 + 50000);
-        m = "2008597857549383489_" + k + "_" + A;
-        n = m.split("_");
-      }
-    } else {
-      const B = Date.now();
-      k = 148407627585 + aO(0, 1000000);
-      l = aO(400, 400 + 50000);
-      m = "2008597857549383489_" + k + "_" + B;
-      n = m.split("_");
-    }
-    const o = aN(this.message, g, l, n[0], k, f, n[0] + "_" + n[1], n[2], h, this.BoxAdXunHuan);
-    await aq(aO(18, 30) * 1000);
-    const p = "https://tube.e.kuaishou.com/rest/e/tube/inspire/task/report";
-    let q = JSON.stringify({
-      "version": "3.3.55.2",
-      "appVersion": "2.7.2.2",
-      "appId": "1091400011",
-      "message": o
-    });
-    q = q.replaceAll("/", "\\/");
-    const s = {
-        "User-Agent": this.ua,
-        "Connection": "Keep-Alive",
-        "Accept-Encoding": "gzip",
-        "Ks-Sig3": await aW("/rest/e/tube/inspire/task/report&&" + q, this.http, this.user_id),
-        "Ks-Encoding": "2",
-        "BrowserUa": this.bua,
-        "SystemUa": this.sua,
-        "Ks-PkgId": "com.kwai.theater1c48a12657a227fa339710301806365b",
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": this.ck
-      },
-      t = await this.http.post(p, q, {
-        "headers": s
-      }),
-      u = t.data;
-    if (u?.["result"] === 1) {
-      try {
-        const D = JSON.parse(aI(u.data));
-        if (D?.["taskFinished"]) {
-          if (D.amount === 50) return this.log("此号疑似黑号"), false;
-          if (D.amount < 100) this.log("此号疑似半黑 尝试手动看视频提高下金币量吧");
-          this.log("宝箱广告第 " + this.BoxAdXunHuan + " 次完成，获得 " + D.amount + " 金币");
-          if (D.popUp && D.popUp.id === "continuousWatchAdPopup") {
-            const E = D.popUp.data?.["buttonInfo"]?.["linkUrl"] || "";
-            if (E && E.trim() !== "") {
-              try {
-                let F = E;
-                while (F.length % 4 !== 0) F += "=";
-                const G = JSON.parse(Buffer.from(F, "base64").toString("utf8"));
-                if (G && G.extParams && G.posId && G.businessId) {
-                  const H = G.extParams,
-                    I = G.posId,
-                    J = G.businessId;
-                  await aq(aO(2, 6) * 1000);
-                  const K = await this.WatchBoxAd(H, I, J);
-                  if (!K) return false;
-                } else this.log("嵌套广告数据结构无效，停止嵌套广告");
-              } catch (L) {
-                this.log("嵌套广告数据解析失败: " + L.message + "，停止嵌套广告");
-              }
-            } else this.log("嵌套广告链接为空，停止嵌套广告");
-          } else {
-            this.log("本次共执行[" + this.BoxAdXunHuan + "]次宝箱广告");
-            this.BoxAdXunHuan = 0;
-          }
-        } else this.log("广告上报失败（A）");
-      } catch (Q) {
-        return this.log("广告响应解析失败: " + Q.message), false;
-      }
-    } else {
-      this.log("广告上报失败（B）");
-    }
-    return true;
-  }
-  async ["main"]() {
-    await this.User_info();
-    await this.Treasure_Box();
-    await aq(aO(3, 6) * 1000);
-    while (true) {
-      if (!(await this.User_info(false))) return;
-      if (!(await this.WatchAD())) break;
-      await aq(aO(15, 40) * 1000);
-    }
-    await this.BoxAd();
-    await this.watchTube();
-  }
-}
-async function aZ() {
-  const f = process.env[aw];
-  if (!f) {
-    console.warn("请先设置环境变量[" + aw + "]");
-    return;
-  }
-  const g = process.env.xfkm;
-  if (!g || !g.trim()) {
-    console.error("未检测到环境变量[xfkm]，请先在青龙面板设置 xfkm 后再运行。");
-    return;
-  }
-  if (ax) try {
-    const n = await ap.get("http://210.16.163.50:19999/gg.php", {
-      "timeout": 10000
-    });
-    let o = n?.["data"] ?? "";
-    if (Buffer.isBuffer(o)) o = o.toString("utf8");
-    o = String(o).trim();
-    o && o !== "0" && console.log(o, "\n\n\n");
-  } catch {}
-  if (ay) {
-    const p = aO(10, 60);
-    console.log("已启用随机延时：" + p + " 秒");
-    await aq(p * 1000);
-  }
-  const h = b0(f);
-  console.log("账号数量：" + h.length);
-  console.log("▶ 开始运行：" + au + " " + av);
-  const i = Date.now(),
-    j = parseInt(process.env.maxth || "1", 10),
-    k = at(Math.max(1, j));
-  await Promise.all(h.map((q, s) => k(async () => {
+  async ["cid"](a, b) {
+    if (!this.valid) return;
     try {
-      const t = new aY(q),
-        u = await t.checkSock5();
-      if (!u.available) t.log("代理不可用 错误信息: [" + u.error + "]", "error");else {
-        if (u.response_time != null) t.log("代理可用 响应时间: [" + u.response_time + "秒]");
+      let g = a;
+      const h = as("enc", this.index);
+      if (!h) {
+        console.log("账号[" + this.index + "] 无法获取enc接口");
+        return;
       }
-      await t.main();
-    } catch (v) {
-      console.error("账号" + (s + 1) + "执行错误:", v);
+      let i = {
+          "method": "get",
+          "url": "http://" + h.url + "?km=" + encodeURIComponent(a3),
+          "headers": {
+            "User-Agent": this.userAgent
+          },
+          "qs": {
+            "salt": this.salt,
+            "userId": this.userId,
+            "did": this.did,
+            "oaid": "",
+            "apist": this.api_st,
+            "adType": g
+          }
+        },
+        j = await aD(i, b, this.sock5);
+      if (j && j.result == 1 && j.feeds && j.feeds[0]) {
+        j.feeds[0].caption && console.log("账号[" + this.index + "] " + j.feeds[0].caption);
+        let k = j.feeds[0].exp_tag,
+          l = k.split("/"),
+          m = l[1],
+          n = m.split("_")[0],
+          o = j.feeds[0].ad.creativeId,
+          p = n,
+          u = j.feedType;
+        if (!p || p === "undefined" || p === "") return;
+        if (u === 0) {
+          const v = at();
+          console.log("账号[" + this.index + "]  随机延迟 " + Math.round(v / 1000) + "秒");
+          await new Promise(x => setTimeout(x, v));
+          let w = "video";
+          await this.sig3(o, p, a, w);
+        }
+      } else {
+        const z = j && (j.result || j.errorMsg || j.error_msg),
+          A = j && (j.errorMsg || j.error_msg || "") || "";
+        if (z == 50 || typeof A === "string" && A.includes("签名验证失败")) return;
+        return;
+      }
+    } catch (B) {
+      return;
     }
-  })));
-  const l = (Date.now() - i) / 1000;
-  console.log("\n■ 运行结束：" + au);
-  console.log("⏱ 总耗时：" + l.toFixed(2) + " 秒");
+  }
+  async ["boxad"](a, b, e, f, g, h) {
+    try {
+      let k = {
+          "method": "post",
+          "url": "https://api.e.kuaishou.com/rest/r/ad/task/report?" + this.query + "&sig=" + a + "&__NS_sig3=" + b + "&__NS_xfalcon=&__NStokensig=" + e,
+          "headers": {
+            "Host": "api.e.kuaishou.com",
+            "User-Agent": "kwai-android aegon/4.9.1",
+            "Cookie": "kuaishou.api_st=" + this.api_st,
+            "page-code": "NEW_TASK_CENTER",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Client-Info": "model=V2049A;os=Android;nqe-score=33;network=WIFI;"
+          },
+          "body": f
+        },
+        l = await aD(k, h, this.sock5);
+      if (l && l.result == 1) {
+        let m = l.data.neoAmount || 0;
+        console.log("账号[" + this.index + "]  开宝箱获得金币:" + m);
+        if (this.j === 0 && l.data.neoAmount === 0) {}
+        const o = au();
+        console.log("账号[" + this.index + "]  随机防黑延迟 " + Math.round(o / 1000) + "秒");
+        await new Promise(p => setTimeout(p, o));
+      } else {
+        let u = l && l.result;
+        const v = l && (l.message || l.error_msg) || "";
+        if (u == 1003 || typeof v === "string" && v.includes("今日奖励领完啦")) {
+          console.log("账号[" + this.index + "]  宝箱任务提示“今日奖励领完啦”，停止该任务");
+          this.stopTask(606);
+          return;
+        }
+        console.log(l);
+      }
+    } catch (w) {
+      return;
+    }
+  }
+  async ["ad"](a, b, e, f, g, h) {
+    try {
+      let j = {
+          "method": "post",
+          "url": "https://api.e.kuaishou.com/rest/r/ad/task/report?" + this.query + "&sig=" + a + "&__NS_sig3=" + b + "&__NS_xfalcon=&__NStokensig=" + e,
+          "headers": {
+            "Host": "api.e.kuaishou.com",
+            "User-Agent": "kwai-android aegon/4.9.1",
+            "Cookie": "kuaishou.api_st=" + this.api_st,
+            "page-code": "NEW_TASK_CENTER",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Client-Info": "model=V2049A;os=Android;nqe-score=33;network=WIFI;"
+          },
+          "body": f
+        },
+        k = await aD(j, h, this.sock5);
+      if (k && k.result == 1) {
+        let l = k.data.neoAmount || 0;
+        console.log("账号[" + this.index + "]  看广告获得金额:" + l);
+        this.j = k.data.awardAmount;
+        const m = au();
+        console.log("账号[" + this.index + "]  随机防黑延迟 " + Math.round(m / 1000) + "秒");
+        await new Promise(n => setTimeout(n, m));
+      } else {
+        let o = k && k.result;
+        const p = k && (k.message || k.error_msg) || "";
+        if (o == 1003 || typeof p === "string" && p.includes("今日奖励领完啦")) {
+          console.log("账号[" + this.index + "]  ad广告任务提示“今日奖励领完啦”，停止该任务");
+          this.stopTask(672);
+          return;
+        }
+        if (k && k.result == 500) {}
+        console.log(k);
+      }
+    } catch (w) {
+      return;
+    }
+  }
+  async ["fanbuad"](a, b, e, f, g, h) {
+    try {
+      let k = {
+          "method": "post",
+          "url": "https://api.e.kuaishou.com/rest/r/ad/task/report?" + this.query + "&sig=" + a + "&__NS_sig3=" + b + "&__NS_xfalcon=&__NStokensig=" + e,
+          "headers": {
+            "Host": "api.e.kuaishou.cn",
+            "User-Agent": "kwai-android aegon/3.56.0",
+            "Cookie": "kuaishou.api_st=" + this.api_st,
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          "body": f
+        },
+        l = await aD(k, h, this.sock5);
+      if (l && l.result == 1) {
+        let m = l.data.neoAmount || 0;
+        console.log("账号[" + this.index + "]  饭补看广告" + m + "金币奖励！");
+        const n = au();
+        console.log("账号[" + this.index + "]  随机防黑延迟 " + Math.round(n / 1000) + "秒");
+        await new Promise(o => setTimeout(o, n));
+      } else {
+        const o = l && l.result,
+          p = l && (l.message || l.error_msg) || "";
+        if (o == 1003 || typeof p === "string" && p.includes("今日奖励领完啦")) {
+          console.log("账号[" + this.index + "]  饭补任务提示“今日奖励领完啦”，停止该任务");
+          this.stopTask(9362);
+          return;
+        }
+        console.log("账号[" + this.index + "] 饭补奖励失败,多次失败请先手动点击饭补的广告是否正常");
+        if (l) console.log(l);
+      }
+    } catch (v) {
+      return;
+    }
+  }
+  async ["ad7038"](a, b, e, f, g, h) {
+    try {
+      let j = {
+          "method": "post",
+          "url": "https://api.e.kuaishou.com/rest/r/ad/task/report?" + this.query + "&sig=" + a + "&__NS_sig3=" + b + "&__NS_xfalcon=&__NStokensig=" + e,
+          "headers": {
+            "Host": "api.e.kuaishou.com",
+            "User-Agent": "kwai-android aegon/4.9.1",
+            "Cookie": "kuaishou.api_st=" + this.api_st,
+            "page-code": "NEW_TASK_CENTER",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Client-Info": "model=V2049A;os=Android;nqe-score=33;network=WIFI;"
+          },
+          "body": f
+        },
+        k = await aD(j, h, this.sock5);
+      if (k && k.result == 1) {
+        let l = k.data.neoAmount || 0;
+        console.log("账号[" + this.index + "]  搜索看广告获得金额:" + l);
+        const m = au();
+        console.log("账号[" + this.index + "]  随机防黑延迟 " + Math.round(m / 1000) + "秒");
+        await new Promise(n => setTimeout(n, m));
+      } else {
+        const o = k && k.result,
+          p = k && (k.message || k.error_msg) || "";
+        if (o == 1003 || typeof p === "string" && p.includes("今日奖励领完啦")) {
+          console.log("账号[" + this.index + "]  搜索任务提示“今日奖励领完啦”，停止该任务");
+          this.stopTask(7038);
+          return;
+        }
+        console.log("账号[" + this.index + "]  搜索看广告奖励失败");
+        if (k) console.log(k);
+      }
+    } catch (u) {
+      return;
+    }
+  }
 }
-function b0(e) {
-  if (e.includes("\n")) return e.split("\n").filter(Boolean);
-  if (e.includes("&")) return e.split("&").filter(Boolean);
-  return [e];
+async function ay(a, b) {
+  try {
+    if (!a) {
+      console.log("账号[" + b + "] 未配置代理，直连");
+      return;
+    }
+    const g = "http://www.baidu.com",
+      h = Date.now(),
+      i = ae("request", "2.88.2");
+    if (!i) {
+      return console.log("账号[" + b + "] 代理测试异常: 依赖request未安装且安装失败"), false;
+    }
+    const j = {
+      "method": "GET",
+      "url": g,
+      "timeout": 10000
+    };
+    function k(p, r) {
+      try {
+        const t = ae("socks-proxy-agent", "^7.0.0");
+        if (!t) throw new Error("socks-proxy-agent 不可用");
+        const u = t.SocksProxyAgent || t.default || t;
+        let v, w, x, y;
+        if (r.includes("|")) {
+          [v, w, x, y] = r.split("|");
+        } else {
+          if (r.includes("#")) {
+            [v, w, x, y] = r.split("#");
+          } else [v, w, x, y] = r.split("|");
+        }
+        const z = x && y,
+          A = z ? x + ":" + y + "@" : "",
+          B = "socks5h://" + A + v + ":" + w;
+        p.agent = new u(B);
+        if (p.proxy) delete p.proxy;
+        p.tunnel = false;
+        if (a6) console.log("账号[" + b + "] [proxy-test] 尝试 SOCKS5: " + v + ":" + w + ", 认证:" + (z ? "是" : "否"));
+        return true;
+      } catch (E) {
+        return console.log("账号[" + b + "] [proxy-test] socks-proxy-agent 初始化失败: " + (E && E.message)), false;
+      }
+    }
+    function l(p, r) {
+      const [u, v, w, x] = r.split("|"),
+        y = w && x,
+        z = y ? "http://" + w + ":" + x + "@" + u + ":" + v : "http://" + u + ":" + v;
+      p.proxy = z;
+      if (p.agent) delete p.agent;
+      p.tunnel = false;
+      p.rejectUnauthorized = false;
+      if (a6) console.log("账号[" + b + "] [proxy-test] 回退 HTTP 代理: " + u + ":" + v + ", 认证:" + (y ? "是" : "否"));
+    }
+    let m = false;
+    return !k(j, a) && (l(j, a), m = true), await new Promise(p => {
+      const t = () => i(j, (u, v, w) => {
+        if (u) {
+          const z = String(u.message || u);
+          if (!m && (/Socks5/i.test(z) || /handshake/i.test(z) || /no accepted authentication type/i.test(z))) try {
+            return l(j, a), m = true, t();
+          } catch (A) {}
+          return console.log("账号[" + b + "] 代理测试失败: " + z), p(false);
+        }
+        const x = Date.now() - h;
+        if (v && v.statusCode >= 200 && v.statusCode < 400) {
+          return console.log("账号[" + b + "] 代理连接正常，延迟 " + x + "ms"), p(true);
+        } else return console.log("账号[" + b + "] 代理测试失败: HTTP " + (v && v.statusCode)), p(false);
+      });
+      t();
+    });
+  } catch (p) {
+    return console.log("账号[" + b + "] 代理测试异常: " + (p.message || p)), false;
+  }
 }
-require.main === module && aZ().catch(e => {
-  console.error(e);
-  process.exit(1);
-});
+!(async () => {
+  if (!(await aB())) return;
+  try {
+    if (af.length > 0) {
+      for (const g of af) {
+        try {
+          await ay(g.sock5, g.index);
+        } catch (h) {}
+      }
+    }
+  } catch (j) {}
+  const b = await ar();
+  if (!b) return;
+  af.length > 0 ? await aw() : console.log("❌没有有效的账号配置，程序退出");
+  await aG(msg);
+})().catch(() => {}).finally(() => W.done());
+function az() {
+  return Math.floor(Math.random() * (10 - 8 + 1)) + 8;
+}
+function aA(b) {
+  let f = Buffer.from(b, "base64").toString("utf-8");
+  return f;
+}
+async function aB() {
+  if (!a3) {
+    return console.log("❌未找到km环境变量，请设置青龙面板的km变量"), false;
+  }
+  if (ab) {
+    const e = ab.split("\n").map(h => h.trim()).filter(h => h),
+      f = e.length > 1 ? e : ab.split("&").map(h => h.trim()).filter(h => h),
+      g = [];
+    for (const h of f) {
+      const i = h.split("@").filter(t => t.trim());
+      if (i.length < 3) {
+        console.log("❌账号格式错误: " + h);
+        continue;
+      }
+      let j = 0,
+        k = "小主";
+      i[0].indexOf("=") === -1 && (k = i[0], j = 1);
+      const l = i[j] || "",
+        m = i[j + 1] || "",
+        n = i[j + 2] || "",
+        o = i[j + 3] || "";
+      if (!l || !m || !n) {
+        console.log("❌账号信息不完整(跳过): " + h);
+        continue;
+      }
+      const p = aC(l);
+      if (!p) {
+        console.log("❌Cookie信息提取失败(跳过): " + k);
+        continue;
+      }
+      const r = new ax({
+        "remark": k,
+        "salt": m,
+        "userAgent": n,
+        "sock5": o,
+        ...p
+      });
+      if (!r.valid) {
+        console.log("❌账号参数不完整(跳过): " + k);
+        continue;
+      }
+      g.push(r);
+    }
+    if (g.length === 0) return console.log("❌未解析到任何有效账号，请检查变量内容"), false;
+    return af = g, ah = af.length, ac = af[0].sock5 || null, console.log("✅共找到" + ah + "个有效账号"), true;
+  } else return console.log("❌未找到ks200环境变量"), console.log("新格式为: cookie@salt@user-agent@sock5 或 remark@cookie@salt@user-agent@sock5"), false;
+}
+function aC(a) {
+  try {
+    const e = {},
+      f = a.split(";");
+    for (let k of f) {
+      const [l, m] = k.trim().split("=");
+      l && m && (e[l.trim()] = m.trim());
+    }
+    const g = e.userId || e.ud,
+      h = e.egid,
+      i = e.did,
+      j = e["kuaishou.api_st"];
+    return g && h && i && j ? {
+      "userId": g,
+      "egid": h,
+      "did": i,
+      "api_st": j
+    } : (console.log("Cookie中缺少必要字段:", {
+      "userId": g,
+      "egid": h,
+      "did": i,
+      "api_st": j
+    }), null);
+  } catch (o) {
+    return console.log("Cookie解析失败:", o.message), null;
+  }
+}
+async function aD(a, b, e = null) {
+  const g = ["http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY", "all_proxy", "ALL_PROXY", "no_proxy", "NO_PROXY", "npm_config_proxy", "npm_config_https_proxy", "npm_config_noproxy"],
+    h = {};
+  for (const o of g) h[o] = process.env[o];
+  for (const p of g) delete process.env[p];
+  var i = ae("request", "2.88.2");
+  if (!i) {
+    return console.log("HTTP请求失败: 依赖request未安装且安装失败"), null;
+  }
+  if (a6) {
+    console.log("[proxy-env] 清理前:", h);
+    const t = {};
+    for (const u of g) t[u] = process.env[u];
+    console.log("[proxy-env] 清理后:", t);
+  }
+  function j(v) {
+    v.tunnel = false;
+    if (v.proxy) delete v.proxy;
+    if (v.agent) delete v.agent;
+  }
+  function l(v, w) {
+    try {
+      const x = ae("socks-proxy-agent", "^7.0.0");
+      if (!x) throw new Error("socks-proxy-agent 不可用或初始化失败");
+      const y = x.SocksProxyAgent || x.default || x;
+      let z, A, B, C;
+      if (w.includes("|")) {
+        [z, A, B, C] = w.split("|");
+      } else w.includes("#") ? [z, A, B, C] = w.split("#") : [z, A, B, C] = w.split("|");
+      const D = B && C,
+        E = D ? B + ":" + C + "@" : "",
+        F = "socks5h://" + E + z + ":" + A;
+      v.agent = new y(F);
+      if (v.proxy) delete v.proxy;
+      v.tunnel = false;
+      if (a6) console.log("代理尝试 SOCKS5: " + z + ":" + A + ", 认证:" + (D ? "是" : "否"));
+      return true;
+    } catch (I) {
+      return console.log("代理socks-proxy-agent 不可用或初始化失败: " + (I && I.message)), false;
+    }
+  }
+  function m(v, w) {
+    const [x, y, z, A] = w.split("|"),
+      B = z && A,
+      C = B ? "http://" + z + ":" + A + "@" + x + ":" + y : "http://" + x + ":" + y;
+    v.proxy = C;
+    if (v.agent) delete v.agent;
+    v.tunnel = false;
+    v.rejectUnauthorized = false;
+    if (a6) console.log("代理回退 HTTP 代理: " + x + ":" + y + ", 认证:" + (B ? "是" : "否"));
+  }
+  let n = false;
+  if (!e && ac) {
+    e = ac;
+  }
+  if (e) {
+    const w = l(a, e);
+    !w && (m(a, e), n = true);
+  } else {
+    if (a6) console.log("代理未配置代理，直连");
+    j(a);
+  }
+  return new Promise(z => {
+    if (!b) {
+      b = "httpRequest";
+    }
+    if (a6) {
+      console.log("\n【debug】===============这是" + b + "请求信息===============");
+      console.log(a);
+    }
+    const B = () => i(a, function (E, F) {
+      if (E) {
+        const I = String(E.message || E);
+        if (e && !n && (/Socks5/i.test(I) || /handshake/i.test(I) || /no accepted authentication type/i.test(I))) {
+          try {
+            if (a6) console.log("代理SOCKS5 握手失败(" + I + ")，尝试回退 HTTP 代理重试一次...");
+            return m(a, e), n = true, B();
+          } catch (K) {}
+        }
+        if (!e && (/407/.test(I) || /tunneling socket/i.test(I))) {
+          if (a6) console.log("代理检测到 407，强制直连重试");
+          return j(a), B();
+        }
+        return console.log("HTTP请求失败: " + I), z(null);
+      }
+      let H = F.body;
+      try {
+        a6 && (console.log("\n\n【debug】===============这是" + b + "返回数据=============="), console.log(H));
+        if (typeof H == "string") {
+          if (N(H)) {
+            let P = JSON.parse(H);
+            a6 && (console.log("\n【debug】=============这是" + b + "json解析后数据============"), console.log(P));
+            z(P);
+          } else {
+            let R = H;
+            z(R);
+          }
+          function N(S) {
+            if (typeof S == "string") try {
+              if (typeof JSON.parse(S) == "object") return true;
+            } catch (T) {
+              return false;
+            }
+            return false;
+          }
+        } else {
+          let S = H;
+          z(S);
+        }
+      } catch (T) {
+        console.log(E, F);
+        console.log("\n " + b + "失败了!请稍后尝试!!");
+      } finally {
+        if (typeof H === "undefined") z(null);
+      }
+    });
+    B();
+  });
+}
+function aE(a) {
+  return new Promise(function (e) {
+    setTimeout(e, a * 1000);
+  });
+}
+function aF(a) {
+  if (W.isNode()) {
+    a && (console.log("" + a), msg += "\n" + a);
+  } else console.log("" + a), msg += "\n" + a;
+}
+async function aG(a) {
+  if (!a) return;
+  if (a5 > 0) {
+    if (W.isNode()) {
+      var e = require("./sendNotify");
+      await e.sendNotify(W.name, a);
+    } else W.msg(W.name, "", a);
+  } else console.log(a);
+}
+function aH(a, b) {
+  "undefined" != typeof process && JSON.stringify(process.env).indexOf("GITHUB") > -1 && process.exit(0);
+  class g {
+    constructor(h) {
+      this.env = h;
+    }
+    ["send"](h, i = "GET") {
+      h = "string" == typeof h ? {
+        "url": h
+      } : h;
+      let j = this.get;
+      return "POST" === i && (j = this.post), new Promise((k, l) => {
+        j.call(this, h, (n, o, p) => {
+          n ? l(n) : k(o);
+        });
+      });
+    }
+    ["get"](h) {
+      return this.send.call(this.env, h);
+    }
+    ["post"](h) {
+      return this.send.call(this.env, h, "POST");
+    }
+  }
+  return new class {
+    constructor(h, i) {
+      this.name = h;
+      this.http = new g(this);
+      this.data = null;
+      this.dataFile = "box.dat";
+      this.logs = [];
+      this.isMute = !1;
+      this.isNeedRewrite = !1;
+      this.logSeparator = "\n";
+      this.startTime = new Date().getTime();
+      Object.assign(this, i);
+      this.log("", "🔔" + this.name + ", 开始!");
+    }
+    ["isNode"]() {
+      return "undefined" != typeof module && !!module.exports;
+    }
+    ["isQuanX"]() {
+      return "undefined" != typeof $task;
+    }
+    ["isSurge"]() {
+      return "undefined" != typeof $httpClient && "undefined" == typeof $loon;
+    }
+    ["isLoon"]() {
+      return "undefined" != typeof $loon;
+    }
+    ["toObj"](h, i = null) {
+      try {
+        return JSON.parse(h);
+      } catch {
+        return i;
+      }
+    }
+    ["toStr"](h, i = null) {
+      try {
+        return JSON.stringify(h);
+      } catch {
+        return i;
+      }
+    }
+    ["getjson"](h, j) {
+      let m = j;
+      const n = this.getdata(h);
+      if (n) try {
+        m = JSON.parse(this.getdata(h));
+      } catch {}
+      return m;
+    }
+    ["setjson"](h, i) {
+      try {
+        return this.setdata(JSON.stringify(h), i);
+      } catch {
+        return !1;
+      }
+    }
+    ["getScript"](h) {
+      return new Promise(i => {
+        this.get({
+          "url": h
+        }, (j, k, l) => i(l));
+      });
+    }
+    ["runScript"](h, i) {
+      return new Promise(k => {
+        let m = this.getdata("@chavy_boxjs_userCfgs.httpapi");
+        m = m ? m.replace(/\n/g, "").trim() : m;
+        let p = this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");
+        p = p ? 1 * p : 20;
+        p = i && i.timeout ? i.timeout : p;
+        const [u, v] = m.split("@"),
+          w = {
+            "url": "http://" + v + "/v1/scripting/evaluate",
+            "body": {
+              "script_text": h,
+              "mock_type": "cron",
+              "timeout": p
+            },
+            "headers": {
+              "X-Key": u,
+              "Accept": "*/*"
+            }
+          };
+        this.post(w, (x, y, z) => k(z));
+      }).catch(k => this.logErr(k));
+    }
+    ["loaddata"]() {
+      if (!this.isNode()) return {};
+      {
+        this.fs = this.fs ? this.fs : require("fs");
+        this.path = this.path ? this.path : require("path");
+        const k = this.path.resolve(this.dataFile),
+          l = this.path.resolve(process.cwd(), this.dataFile),
+          m = this.fs.existsSync(k),
+          n = !m && this.fs.existsSync(l);
+        if (!m && !n) return {};
+        {
+          const p = m ? k : l;
+          try {
+            return JSON.parse(this.fs.readFileSync(p));
+          } catch (u) {
+            return {};
+          }
+        }
+      }
+    }
+    ["writedata"]() {
+      if (this.isNode()) {
+        this.fs = this.fs ? this.fs : require("fs");
+        this.path = this.path ? this.path : require("path");
+        const h = this.path.resolve(this.dataFile),
+          j = this.path.resolve(process.cwd(), this.dataFile),
+          k = this.fs.existsSync(h),
+          l = !k && this.fs.existsSync(j),
+          m = JSON.stringify(this.data);
+        k ? this.fs.writeFileSync(h, m) : l ? this.fs.writeFileSync(j, m) : this.fs.writeFileSync(h, m);
+      }
+    }
+    ["lodash_get"](h, j, k) {
+      const l = j.replace(/\[(\d+)\]/g, ".$1").split(".");
+      let m = h;
+      for (const n of l) if (m = Object(m)[n], void 0 === m) return k;
+      return m;
+    }
+    ["lodash_set"](h, i, j) {
+      return Object(h) !== h ? h : (Array.isArray(i) || (i = i.toString().match(/[^.[\]]+/g) || []), i.slice(0, -1).reduce((k, l, m) => Object(k[l]) === k[l] ? k[l] : k[l] = Math.abs(i[m + 1]) >> 0 == +i[m + 1] ? [] : {}, h)[i[i.length - 1]] = j, h);
+    }
+    ["getdata"](h) {
+      let j = this.getval(h);
+      if (/^@/.test(h)) {
+        const [, k, l] = /^@(.*?)\.(.*?)$/.exec(h),
+          m = k ? this.getval(k) : "";
+        if (m) try {
+          const n = JSON.parse(m);
+          j = n ? this.lodash_get(n, l, "") : j;
+        } catch (o) {
+          j = "";
+        }
+      }
+      return j;
+    }
+    ["setdata"](j, k) {
+      let m = false;
+      if (/^@/.test(k)) {
+        const [, n, p] = /^@(.*?)\.(.*?)$/.exec(k),
+          u = this.getval(n),
+          v = n ? "null" === u ? null : u || "{}" : "{}";
+        try {
+          const w = JSON.parse(v);
+          this.lodash_set(w, p, j);
+          m = this.setval(JSON.stringify(w), n);
+        } catch (y) {
+          const A = {};
+          this.lodash_set(A, p, j);
+          m = this.setval(JSON.stringify(A), n);
+        }
+      } else m = this.setval(j, k);
+      return m;
+    }
+    ["getval"](h) {
+      return this.isSurge() || this.isLoon() ? $persistentStore.read(h) : this.isQuanX() ? $prefs.valueForKey(h) : this.isNode() ? (this.data = this.loaddata(), this.data[h]) : this.data && this.data[h] || null;
+    }
+    ["setval"](h, i) {
+      return this.isSurge() || this.isLoon() ? $persistentStore.write(h, i) : this.isQuanX() ? $prefs.setValueForKey(h, i) : this.isNode() ? (this.data = this.loaddata(), this.data[i] = h, this.writedata(), !0) : this.data && this.data[i] || null;
+    }
+    ["initGotEnv"](h) {
+      this.got = this.got ? this.got : require("got");
+      this.cktough = this.cktough ? this.cktough : require("tough-cookie");
+      this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar();
+      h && (h.headers = h.headers ? h.headers : {}, void 0 === h.headers.Cookie && void 0 === h.cookieJar && (h.cookieJar = this.ckjar));
+    }
+    ["get"](h, i = () => {}) {
+      h.headers && (delete h.headers["Content-Type"], delete h.headers["Content-Length"]);
+      this.isSurge() || this.isLoon() ? (this.isSurge() && this.isNeedRewrite && (h.headers = h.headers || {}, Object.assign(h.headers, {
+        "X-Surge-Skip-Scripting": !1
+      })), $httpClient.get(h, (k, l, m) => {
+        !k && l && (l.body = m, l.statusCode = l.status);
+        i(k, l, m);
+      })) : this.isQuanX() ? (this.isNeedRewrite && (h.opts = h.opts || {}, Object.assign(h.opts, {
+        "hints": !1
+      })), $task.fetch(h).then(k => {
+        const {
+          statusCode: l,
+          statusCode: m,
+          headers: n,
+          body: p
+        } = k;
+        i(null, {
+          "status": l,
+          "statusCode": m,
+          "headers": n,
+          "body": p
+        }, p);
+      }, k => i(k))) : this.isNode() && (this.initGotEnv(h), this.got(h).on("redirect", (k, l) => {
+        try {
+          if (k.headers["set-cookie"]) {
+            const n = k.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();
+            n && this.ckjar.setCookieSync(n, null);
+            l.cookieJar = this.ckjar;
+          }
+        } catch (p) {
+          this.logErr(p);
+        }
+      }).then(k => {
+        const {
+          statusCode: l,
+          statusCode: m,
+          headers: n,
+          body: p
+        } = k;
+        i(null, {
+          "status": l,
+          "statusCode": m,
+          "headers": n,
+          "body": p
+        }, p);
+      }, k => {
+        const {
+          message: l,
+          response: m
+        } = k;
+        i(l, m, m && m.body);
+      }));
+    }
+    ["post"](h, j = () => {}) {
+      if (h.body && h.headers && !h.headers["Content-Type"] && (h.headers["Content-Type"] = "application/x-www-form-urlencoded"), h.headers && delete h.headers["Content-Length"], this.isSurge() || this.isLoon()) this.isSurge() && this.isNeedRewrite && (h.headers = h.headers || {}, Object.assign(h.headers, {
+        "X-Surge-Skip-Scripting": !1
+      })), $httpClient.post(h, (l, m, n) => {
+        !l && m && (m.body = n, m.statusCode = m.status);
+        j(l, m, n);
+      });else {
+        if (this.isQuanX()) h.method = "POST", this.isNeedRewrite && (h.opts = h.opts || {}, Object.assign(h.opts, {
+          "hints": !1
+        })), $task.fetch(h).then(l => {
+          const {
+            statusCode: m,
+            statusCode: n,
+            headers: p,
+            body: u
+          } = l;
+          j(null, {
+            "status": m,
+            "statusCode": n,
+            "headers": p,
+            "body": u
+          }, u);
+        }, l => j(l));else {
+          if (this.isNode()) {
+            this.initGotEnv(h);
+            const {
+              url: l,
+              ...m
+            } = h;
+            this.got.post(l, m).then(n => {
+              const {
+                statusCode: p,
+                statusCode: u,
+                headers: v,
+                body: w
+              } = n;
+              j(null, {
+                "status": p,
+                "statusCode": u,
+                "headers": v,
+                "body": w
+              }, w);
+            }, n => {
+              const {
+                message: o,
+                response: p
+              } = n;
+              j(o, p, p && p.body);
+            });
+          }
+        }
+      }
+    }
+    ["time"](h, j = null) {
+      const k = j ? new Date(j) : new Date();
+      let l = {
+        "M+": k.getMonth() + 1,
+        "d+": k.getDate(),
+        "H+": k.getHours(),
+        "m+": k.getMinutes(),
+        "s+": k.getSeconds(),
+        "q+": Math.floor((k.getMonth() + 3) / 3),
+        "S": k.getMilliseconds()
+      };
+      /(y+)/.test(h) && (h = h.replace(RegExp.$1, (k.getFullYear() + "").substr(4 - RegExp.$1.length)));
+      for (let m in l) new RegExp("(" + m + ")").test(h) && (h = h.replace(RegExp.$1, 1 == RegExp.$1.length ? l[m] : ("00" + l[m]).substr(("" + l[m]).length)));
+      return h;
+    }
+    ["msg"](h = a, j = "", k = "", l) {
+      const n = p => {
+        if (!p) return p;
+        if ("string" == typeof p) return this.isLoon() ? p : this.isQuanX() ? {
+          "open-url": p
+        } : this.isSurge() ? {
+          "url": p
+        } : void 0;
+        if ("object" == typeof p) {
+          if (this.isLoon()) {
+            let u = p.openUrl || p.url || p["open-url"],
+              v = p.mediaUrl || p["media-url"];
+            return {
+              "openUrl": u,
+              "mediaUrl": v
+            };
+          }
+          if (this.isQuanX()) {
+            let x = p["open-url"] || p.url || p.openUrl,
+              y = p["media-url"] || p.mediaUrl;
+            return {
+              "open-url": x,
+              "media-url": y
+            };
+          }
+          if (this.isSurge()) {
+            let z = p.url || p.openUrl || p["open-url"];
+            return {
+              "url": z
+            };
+          }
+        }
+      };
+      if (this.isMute || (this.isSurge() || this.isLoon() ? $notification.post(h, j, k, n(l)) : this.isQuanX() && $notify(h, j, k, n(l))), !this.isMuteLog) {
+        let p = ["", "==============📣系统通知📣=============="];
+        p.push(h);
+        j && p.push(j);
+        k && p.push(k);
+        console.log(p.join("\n"));
+        this.logs = this.logs.concat(p);
+      }
+    }
+    ["log"](...h) {
+      h.length > 0 && (this.logs = [...this.logs, ...h]);
+      console.log(h.join(this.logSeparator));
+    }
+    ["logErr"](h, i) {
+      const k = !this.isSurge() && !this.isQuanX() && !this.isLoon();
+      k ? this.log("", "❗️" + this.name + ", 错误!", h.stack) : this.log("", "❗️" + this.name + ", 错误!", h);
+    }
+    ["wait"](h) {
+      return new Promise(i => setTimeout(i, h));
+    }
+    ["done"](h = {}) {
+      const i = new Date().getTime(),
+        j = (i - this.startTime) / 1000;
+      this.log("", "🔔" + this.name + ", 结束! 🕛 " + j + " 秒");
+      this.log();
+      (this.isSurge() || this.isQuanX() || this.isLoon()) && $done(h);
+    }
+  }(a, b);
+}
